@@ -248,14 +248,16 @@ export default function Sidebar({ state, onChange, onAddressSearch }: Props) {
           <SectionTitle>👨‍👩‍👧 자녀 정보</SectionTitle>
 
           {state.children.map((child, idx) => (
-            <div key={idx} className="mb-2 flex gap-2">
+            <div key={idx} className="mb-2 flex items-center gap-2">
               <input
                 type="text"
                 dir="ltr"
                 value={child.role}
                 onChange={(e) => handleChildChange(idx, 'role', e.target.value)}
                 placeholder="역할"
-                className={`${inputCls} w-20 shrink-0 caret-[#2D1B1B]`}
+                className="w-16 shrink-0 rounded border border-[#E8D8D0] bg-[#FFFAF8]
+                           px-2 py-1.5 font-myeongjo text-[13px] text-[#2D1B1B]
+                           caret-[#2D1B1B] outline-none focus:border-[#E8899A]"
               />
               <input
                 type="text"
@@ -263,14 +265,16 @@ export default function Sidebar({ state, onChange, onAddressSearch }: Props) {
                 value={child.name}
                 onChange={(e) => handleChildChange(idx, 'name', e.target.value)}
                 placeholder="이름"
-                className={`${inputCls} min-w-0 flex-1 caret-[#2D1B1B]`}
+                className="min-w-0 flex-1 rounded border border-[#E8D8D0] bg-[#FFFAF8]
+                           px-2 py-1.5 font-myeongjo text-[13px] text-[#2D1B1B]
+                           caret-[#2D1B1B] outline-none focus:border-[#E8899A]"
               />
               <button
                 type="button"
                 onClick={() => removeChild(idx)}
                 aria-label={`${idx + 1}번째 자녀 삭제`}
-                className="shrink-0 rounded-lg border border-[#E8D8D0] px-2.5 text-[#9E7070]
-                           transition-colors hover:border-red-200 hover:text-red-400"
+                className="shrink-0 rounded-lg border border-[#E8D8D0] px-2.5 py-1.5
+                           text-[#9E7070] transition-colors hover:border-red-200 hover:text-red-400"
               >
                 ✕
               </button>
