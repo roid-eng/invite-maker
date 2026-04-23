@@ -251,17 +251,19 @@ export default function Sidebar({ state, onChange, onAddressSearch }: Props) {
             <div key={idx} className="mb-2 flex gap-2">
               <input
                 type="text"
+                dir="ltr"
                 value={child.role}
                 onChange={(e) => handleChildChange(idx, 'role', e.target.value)}
-                placeholder="역할 (예: 장남)"
-                className={`${inputCls} w-24`}
+                placeholder="역할"
+                className={`${inputCls} w-20 shrink-0 caret-[#2D1B1B]`}
               />
               <input
                 type="text"
+                dir="ltr"
                 value={child.name}
                 onChange={(e) => handleChildChange(idx, 'name', e.target.value)}
                 placeholder="이름"
-                className={`${inputCls} flex-1`}
+                className={`${inputCls} min-w-0 flex-1 caret-[#2D1B1B]`}
               />
               <button
                 type="button"
