@@ -68,6 +68,7 @@ export default function InvitationPreview({ data, isPreview = false }: Props) {
     placeName,
     placeAddress,
     message,
+    deadline,
     children,   // ChildInfo[] — FamilySection에 members로 전달
     features,
   } = data
@@ -120,6 +121,7 @@ export default function InvitationPreview({ data, isPreview = false }: Props) {
       <RsvpSection
         theme={theme}
         showRsvp={showRsvp}
+        deadline={deadline}
         onSubmit={handleRsvpSubmit}
       />
       <FamilySection
@@ -131,12 +133,14 @@ export default function InvitationPreview({ data, isPreview = false }: Props) {
     </article>
   )
 
-  /* ── 수신자 뷰: 프레임 없이 풀스크린 ── */
+  /* ── 수신자 뷰: PC는 중앙 max-430px, 모바일은 풀스크린 ── */
   if (!isPreview) {
     return (
-      <main className="min-h-screen w-full bg-white">
-        {sections}
-      </main>
+      <div className="flex min-h-screen justify-center bg-[#EDE4DC]">
+        <main className="w-full max-w-[430px] bg-white pb-[72px]">
+          {sections}
+        </main>
+      </div>
     )
   }
 

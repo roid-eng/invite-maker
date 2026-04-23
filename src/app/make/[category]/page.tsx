@@ -9,6 +9,25 @@ import { logCompleteEditor } from '@/lib/analytics'
 import { useInvitation } from '@/hooks/useInvitation'
 import type { Category, InvitationData, InvitationState } from '@/types'
 
+// Daum Postcode 전역 타입 선언
+declare global {
+  interface Window {
+    daum?: {
+      Postcode: new (options: { oncomplete: (data: { address: string }) => void }) => { open(): void }
+    }
+  }
+}
+
+function loadDaumPostcodeScript(): Promise<void> {
+  return new Promise((resolve) => {
+    if (window.daum?.Postcode) { resolve(); return }
+    const script = document.createElement('script')
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+    script.onload = () => resolve()
+    document.head.appendChild(script)
+  })
+}
+
 // ─── 카테고리 가드 ────────────────────────────────────────────
 const VALID_CATEGORIES = new Set<string>(['chilsung', 'doljanchi', 'birthday'])
 
@@ -24,11 +43,14 @@ function toCreateInput(
     category:     state.category,
     theme:        state.theme,
     name:         state.name,
+    born:         state.born      || undefined,
+    eventType:    state.eventType || undefined,
     date:         state.date,
     time:         state.time,
     placeName:    state.placeName,
     placeAddress: state.placeAddress,
     message:      state.message   || undefined,
+    deadline:     state.deadline  || undefined,
     children:     state.children.length > 0 ? state.children : undefined,
     features:     state.features,
   }
@@ -83,6 +105,15 @@ export default function MakePage({ params }: Props) {
     setToast({ message, variant })
     setTimeout(() => setToast(null), 3000)
   }, [])
+
+  const handleAddressSearch = useCallback(async () => {
+    await loadDaumPostcodeScript()
+    new window.daum!.Postcode({
+      oncomplete(data) {
+        update({ placeAddress: data.address })
+      },
+    }).open()
+  }, [update])
 
   // 미리보기용 데이터 — 빈 필수 필드는 힌트 텍스트로 대체
   const previewData: InvitationData = useMemo(() => ({
@@ -156,7 +187,7 @@ export default function MakePage({ params }: Props) {
       <div className="flex flex-1 overflow-hidden">
 
         {/* Sidebar — PC: 320px 고정 / 모바일: fixed bottom 60vh */}
-        <Sidebar state={state} onChange={update} />
+        <Sidebar state={state} onChange={update} onAddressSearch={handleAddressSearch} />
 
         {/* 미리보기 영역 */}
         <main

@@ -29,11 +29,14 @@ export type InvitationData = {
   category: Category
   theme: Theme
   name: string           // 주인공 이름, 최대 10자
+  born?: string          // 출생 정보 (예: "1955년생 · 만 70세")
+  eventType?: string     // 한자 행사 유형 (예: "七旬", "還甲")
   date: string           // ISO 형식 (YYYY-MM-DD)
   time: string           // HH:MM
   placeName: string      // 최대 20자
   placeAddress: string   // 카카오 주소 API 반환값
   message?: string       // 추가 메시지, 최대 100자
+  deadline?: string      // RSVP 마감일 (YYYY-MM-DD)
   children?: ChildInfo[]
   features?: InvitationFeatures
   meta?: InvitationMeta

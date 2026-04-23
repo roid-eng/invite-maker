@@ -18,6 +18,13 @@ function todayKST(): string {
   return d.toISOString().slice(0, 10)
 }
 
+// YYYY-MM-DD → "MM월 DD일까지 회신 부탁드립니다"
+function formatDeadlinePreview(iso: string): string {
+  const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!match) return iso
+  return `${parseInt(match[2], 10)}월 ${parseInt(match[3], 10)}일까지 회신 부탁드립니다`
+}
+
 // ─── 내부 헬퍼 컴포넌트 ──────────────────────────────────────
 
 function SectionTitle({ children }: { children: string }) {
@@ -222,12 +229,17 @@ export default function Sidebar({ state, onChange, onAddressSearch }: Props) {
               RSVP 마감일
             </label>
             <input
-              type="text"
+              type="date"
               value={state.deadline}
               onChange={(e) => onChange({ deadline: e.target.value })}
-              placeholder="예) 5월 10일(토)까지 회신 부탁드립니다"
+              min={todayKST()}
               className={inputCls}
             />
+            {state.deadline && (
+              <p className="mt-1 font-dodum text-[10px] text-[#9E7070] opacity-60">
+                ※ {formatDeadlinePreview(state.deadline)}
+              </p>
+            )}
           </div>
         </section>
 

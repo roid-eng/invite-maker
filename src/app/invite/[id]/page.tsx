@@ -64,14 +64,11 @@ export default async function InvitePage({ params }: Props) {
       {/* analytics는 브라우저 전용이므로 분리된 client 컴포넌트로 처리 */}
       <ViewAnalytics id={params.id} />
 
-      {/* 초대장 본문 — 하단 고정 바 높이(72px)만큼 패딩 확보 */}
-      <div className="pb-[72px]">
-        <InvitationPreview data={data} isPreview={false} />
-      </div>
+      <InvitationPreview data={data} isPreview={false} />
 
-      {/* 하단 고정 바 */}
+      {/* 하단 고정 바 — PC에서도 초대장 너비(430px)에 맞춰 중앙 정렬 */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-40
+        className="fixed bottom-0 left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2
                    border-t border-[#E8D8D0] bg-white/95 px-4 py-3
                    backdrop-blur-sm"
       >

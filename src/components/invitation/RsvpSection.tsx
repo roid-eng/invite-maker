@@ -48,6 +48,13 @@ const PALETTE: Record<Theme, RsvpPalette> = {
   },
 }
 
+// YYYY-MM-DD → "MM월 DD일까지 회신 부탁드립니다" (그 외 형식은 그대로)
+function formatDeadline(value: string): string {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!match) return value
+  return `${parseInt(match[2], 10)}월 ${parseInt(match[3], 10)}일까지 회신 부탁드립니다`
+}
+
 // ─── 컴포넌트 ─────────────────────────────────────────────────
 export default function RsvpSection({ theme, showRsvp, deadline, onSubmit }: Props) {
   const p = PALETTE[theme]
@@ -147,7 +154,7 @@ export default function RsvpSection({ theme, showRsvp, deadline, onSubmit }: Pro
             className="mt-3 font-dodum text-[10px] opacity-40"
             style={{ color: p.muted }}
           >
-            ※ {deadline}
+            ※ {formatDeadline(deadline)}
           </p>
         )}
       </section>
