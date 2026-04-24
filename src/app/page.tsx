@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import InvitationPreview from '@/components/invitation/InvitationPreview'
 import CategoryCards from './_components/CategoryCards'
+import FindInvitation from './_components/FindInvitation'
 import type { InvitationData } from '@/types'
 
 // ─── OG 메타데이터 ────────────────────────────────────────────
@@ -101,6 +102,9 @@ export default function HomePage() {
         </p>
         <CategoryCards />
       </section>
+
+      {/* ── 초대장 찾기 ── */}
+      <FindInvitation />
 
       {/* ── 데모 미리보기 ── */}
       <section className="pb-16">

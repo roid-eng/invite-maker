@@ -4,6 +4,11 @@ import {
   setDoc,
   updateDoc,
   increment,
+  collection,
+  query,
+  where,
+  limit,
+  getDocs,
   serverTimestamp,
 } from 'firebase/firestore'
 import { nanoid } from 'nanoid'
@@ -44,6 +49,23 @@ export async function getInvitation(id: string): Promise<InvitationData | null> 
     const snap = await getDoc(ref)
     if (!snap.exists()) return null
     return { id: snap.id, ...(snap.data() as Omit<InvitationData, 'id'>) }
+  } catch (error) {
+    throw new Error(
+      `초대장 조회에 실패했습니다. ${error instanceof Error ? error.message : String(error)}`,
+    )
+  }
+}
+
+/**
+ * 관리 코드로 초대장 ID를 조회한다.
+ * 일치하는 문서가 없으면 null을 반환한다.
+ */
+export async function findByManageCode(code: string): Promise<string | null> {
+  try {
+    const q    = query(collection(db, 'invitations'), where('manageCode', '==', code), limit(1))
+    const snap = await getDocs(q)
+    if (snap.empty) return null
+    return snap.docs[0].id
   } catch (error) {
     throw new Error(
       `초대장 조회에 실패했습니다. ${error instanceof Error ? error.message : String(error)}`,
