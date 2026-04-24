@@ -10,6 +10,7 @@ import {
   limit,
   getDocs,
   serverTimestamp,
+  Timestamp,
 } from 'firebase/firestore'
 import { nanoid } from 'nanoid'
 import { db } from './index'
@@ -26,10 +27,22 @@ export async function createInvitation(data: CreateInput): Promise<{ id: string;
   const manageCode = nanoid(4).toUpperCase()
   const ref        = doc(db, 'invitations', id)
 
+  // 무료: 행사일 + 7일 / 파싱 실패 시 생성일 기준 90일 fallback
+  let expiresAt: Timestamp
+  try {
+    const eventDate = new Date(data.date)
+    if (isNaN(eventDate.getTime())) throw new Error()
+    eventDate.setDate(eventDate.getDate() + 7)
+    expiresAt = Timestamp.fromDate(eventDate)
+  } catch {
+    expiresAt = Timestamp.fromDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000))
+  }
+
   try {
     await setDoc(ref, {
       ...data,
       manageCode,
+      expiresAt,
       viewCount: 0,
       createdAt: serverTimestamp(),
     })

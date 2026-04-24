@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getInvitation, incrementViews } from '@/lib/firebase/invitations'
 import InvitationPreview from '@/components/invitation/InvitationPreview'
+import ExpiredScreen from '@/components/ui/ExpiredScreen'
 import ViewAnalytics from './_components/ViewAnalytics'
 
 // ─── 요청당 1회만 Firestore 조회 (generateMetadata + page 공유) ─
@@ -55,8 +56,12 @@ export default async function InvitePage({ params }: Props) {
   const data = await fetchInvitation(params.id).catch(() => null)
   if (!data) notFound()
 
+  // 만료 체크 (KST 불필요 — Firestore Timestamp는 UTC 절대값)
+  if (data.expiresAt && data.expiresAt.toDate() < new Date()) {
+    return <ExpiredScreen />
+  }
+
   // 조회수 증가 — 실패해도 렌더링에 영향 없음
-  // Next.js App Router(Node.js 런타임)에서 응답 반환 후에도 promise 실행 유지
   void incrementViews(params.id).catch(() => undefined)
 
   return (

@@ -38,6 +38,7 @@ export type InvitationData = {
   message?: string       // 추가 메시지, 최대 100자
   deadline?: string      // RSVP 마감일 (YYYY-MM-DD)
   manageCode?: string    // 4자리 관리 코드 (제작자 전용)
+  expiresAt?: Timestamp  // 무료: 행사일+7일 / fallback: 생성일+90일
   children?: ChildInfo[]
   features?: InvitationFeatures
   meta?: InvitationMeta

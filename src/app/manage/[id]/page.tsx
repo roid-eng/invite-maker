@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getInvitation } from '@/lib/firebase/invitations'
 import { subscribeRsvpStats, type RsvpStats } from '@/lib/firebase/rsvp'
+import ExpiredScreen from '@/components/ui/ExpiredScreen'
 import type { InvitationData, Theme } from '@/types'
+import type { Timestamp } from 'firebase/firestore'
 
 // ─── 테마 팔레트 ──────────────────────────────────────────────
 const PALETTE: Record<Theme, { primary: string; bg: string; light: string }> = {
@@ -29,7 +31,7 @@ function saveLock(id: string, data: LockData): void {
   try { localStorage.setItem(lockKey(id), JSON.stringify(data)) } catch { /* 무시 */ }
 }
 
-// ─── D-day 계산 ───────────────────────────────────────────────
+// ─── D-day 계산 (RSVP 마감) ──────────────────────────────────
 function calcDday(deadline: string): string {
   const todayStr = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10)
   const diff     = Math.ceil(
@@ -38,6 +40,14 @@ function calcDday(deadline: string): string {
   if (diff > 0) return `D-${diff}`
   if (diff === 0) return 'D-Day'
   return `마감됨`
+}
+
+// ─── 만료 배지 (초대장 유지 기간) ────────────────────────────
+function expiryBadge(expiresAt?: Timestamp): string {
+  if (!expiresAt) return ''
+  const diff = Math.ceil((expiresAt.toDate().getTime() - Date.now()) / 86_400_000)
+  if (diff <= 0) return '만료됨'
+  return `D-${diff} 만료 예정`
 }
 
 // ─── 인증 화면 ────────────────────────────────────────────────
@@ -177,6 +187,21 @@ function Dashboard({ data, id }: { data: InvitationData; id: string }) {
           </p>
           <p className="mt-2 font-dodum text-[13px] text-[#5A3A3A]">{data.date} · {data.time}</p>
           <p className="font-dodum text-[13px] text-[#5A3A3A]">{data.placeName}</p>
+          {data.expiresAt && (
+            <div className="mt-3 flex items-center justify-between rounded-xl
+                            bg-white/60 px-3 py-2">
+              <p className="font-dodum text-[11px] font-bold" style={{ color: p.primary }}>
+                {expiryBadge(data.expiresAt)}
+              </p>
+              <button
+                type="button"
+                className="font-dodum text-[10px] underline underline-offset-2"
+                style={{ color: p.primary }}
+              >
+                프리미엄으로 연장하기
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 참석 현황 요약 */}
@@ -277,6 +302,10 @@ export default function ManagePage({ params }: Props) {
   }
 
   if (!data) return null
+
+  if (data.expiresAt && data.expiresAt.toDate() < new Date()) {
+    return <ExpiredScreen />
+  }
 
   if (!authed) {
     return (

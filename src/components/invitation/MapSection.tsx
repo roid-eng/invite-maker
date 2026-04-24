@@ -65,7 +65,7 @@ export default function MapSection({ theme, placeName, placeAddress, showMap }: 
   const p = PALETTE[theme]
 
   const kakaoMapUrl = `https://map.kakao.com/link/search/${encodeURIComponent(
-    [placeName, placeAddress].filter(Boolean).join(' '),
+    placeAddress || placeName,
   )}`
 
   return (

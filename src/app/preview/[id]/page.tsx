@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getInvitation } from '@/lib/firebase/invitations'
 import InvitationPreview from '@/components/invitation/InvitationPreview'
+import ExpiredScreen from '@/components/ui/ExpiredScreen'
 import { logCopyLink, logShareKakao, logSaveImage } from '@/lib/analytics'
 import type { InvitationData } from '@/types'
 
@@ -144,6 +145,10 @@ export default function PreviewPage({ params }: Props) {
   }
 
   if (!data) return null
+
+  if (data.expiresAt && data.expiresAt.toDate() < new Date()) {
+    return <ExpiredScreen />
+  }
 
   // ─── 공유 버튼 공통 스타일 ───────────────────────────────────
   const btnBase =
