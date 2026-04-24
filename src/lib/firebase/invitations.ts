@@ -16,7 +16,7 @@ import { nanoid } from 'nanoid'
 import { db } from './index'
 import type { InvitationData } from '@/types'
 
-type CreateInput = Omit<InvitationData, 'id' | 'createdAt' | 'viewCount' | 'meta' | 'manageCode'>
+type CreateInput = Omit<InvitationData, 'id' | 'createdAt' | 'viewCount' | 'meta' | 'manageCode' | 'expiresAt'>
 
 /**
  * 초대장을 Firestore에 저장하고 생성된 ID와 관리 코드를 반환한다.
@@ -28,19 +28,26 @@ export async function createInvitation(data: CreateInput): Promise<{ id: string;
   const ref        = doc(db, 'invitations', id)
 
   // 무료: 행사일 + 7일 / 파싱 실패 시 생성일 기준 90일 fallback
-  let expiresAt: Timestamp
-  try {
-    const eventDate = new Date(data.date)
-    if (isNaN(eventDate.getTime())) throw new Error()
-    eventDate.setDate(eventDate.getDate() + 7)
-    expiresAt = Timestamp.fromDate(eventDate)
-  } catch {
-    expiresAt = Timestamp.fromDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000))
-  }
+  const eventDate = new Date(data.date)
+  const expiresAt = isNaN(eventDate.getTime())
+    ? Timestamp.fromDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000))
+    : Timestamp.fromDate(new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate() + 7))
 
   try {
     await setDoc(ref, {
-      ...data,
+      category:     data.category,
+      theme:        data.theme,
+      name:         data.name,
+      date:         data.date,
+      time:         data.time,
+      placeName:    data.placeName,
+      placeAddress: data.placeAddress,
+      ...(data.born        && { born:        data.born }),
+      ...(data.eventType   && { eventType:   data.eventType }),
+      ...(data.message     && { message:     data.message }),
+      ...(data.deadline    && { deadline:    data.deadline }),
+      ...(data.children    && { children:    data.children }),
+      ...(data.features    && { features:    data.features }),
       manageCode,
       expiresAt,
       viewCount: 0,

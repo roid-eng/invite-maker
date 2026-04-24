@@ -38,7 +38,7 @@ function toCategory(raw: string): Category {
 // ─── InvitationState → createInvitation 입력 변환 ────────────
 function toCreateInput(
   state: InvitationState,
-): Omit<InvitationData, 'id' | 'createdAt' | 'viewCount' | 'meta'> {
+): Omit<InvitationData, 'id' | 'createdAt' | 'viewCount' | 'meta' | 'manageCode' | 'expiresAt'> {
   return {
     category:     state.category,
     theme:        state.theme,
