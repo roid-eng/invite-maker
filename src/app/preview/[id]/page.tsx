@@ -114,15 +114,22 @@ export default function PreviewPage({ params }: Props) {
     if (!captureRef.current || saving) return
     setSaving(true)
     try {
+      const el = captureRef.current
       const { default: html2canvas } = await import('html2canvas')
-      const canvas = await html2canvas(captureRef.current, {
-        useCORS: true,
-        scale:   2,
-        backgroundColor: null,
+      const canvas = await html2canvas(el, {
+        scale:        2,
+        useCORS:      true,
+        allowTaint:   true,
+        scrollX:      0,
+        scrollY:      0,
+        windowWidth:  el.scrollWidth,
+        windowHeight: el.scrollHeight,
+        width:        el.scrollWidth,
+        height:       el.scrollHeight,
       })
-      const link      = document.createElement('a')
-      link.download   = `초대장_${params.id}.png`
-      link.href       = canvas.toDataURL('image/png')
+      const link    = document.createElement('a')
+      link.download = `초대장_${params.id}.png`
+      link.href     = canvas.toDataURL('image/png')
       link.click()
       logSaveImage(params.id)
     } catch {
@@ -173,12 +180,19 @@ export default function PreviewPage({ params }: Props) {
         </div>
       </header>
 
-      {/* ── 초대장 미리보기 (캡처 대상 포함) ── */}
+      {/* ── 초대장 미리보기 (화면 표시용 폰 프레임) ── */}
       <main className="flex-1 overflow-y-auto pb-[240px]">
-        <div ref={captureRef}>
-          <InvitationPreview data={data} isPreview />
-        </div>
+        <InvitationPreview data={data} isPreview />
       </main>
+
+      {/* ── 이미지 저장 캡처 전용 DOM (화면 밖 렌더링, 수신자 뷰와 동일 구조) ── */}
+      <div
+        ref={captureRef}
+        aria-hidden="true"
+        style={{ position: 'absolute', left: '-9999px', top: 0, width: '430px' }}
+      >
+        <InvitationPreview data={data} isPreview={false} />
+      </div>
 
       {/* ── 하단 고정 공유 시트 ── */}
       <div
