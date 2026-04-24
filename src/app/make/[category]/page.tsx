@@ -128,7 +128,7 @@ export default function MakePage({ params }: Props) {
 
     setSaving(true)
     try {
-      const id = await createInvitation(toCreateInput(state))
+      const { id } = await createInvitation(toCreateInput(state))
       logCompleteEditor(id)
       router.push(`/preview/${id}`)
     } catch {

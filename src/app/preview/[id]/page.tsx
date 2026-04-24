@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { getInvitation } from '@/lib/firebase/invitations'
 import InvitationPreview from '@/components/invitation/InvitationPreview'
 import { logCopyLink, logShareKakao, logSaveImage } from '@/lib/analytics'
@@ -26,10 +27,11 @@ export default function PreviewPage({ params }: Props) {
   const router   = useRouter()
   const captureRef = useRef<HTMLDivElement>(null)
 
-  const [data,    setData]    = useState<InvitationData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [copied,  setCopied]  = useState(false)
-  const [saving,  setSaving]  = useState(false)
+  const [data,         setData]        = useState<InvitationData | null>(null)
+  const [loading,      setLoading]     = useState(true)
+  const [copied,       setCopied]      = useState(false)
+  const [codeCopied,   setCodeCopied]  = useState(false)
+  const [saving,       setSaving]      = useState(false)
 
   // ─── 초대장 데이터 로드 ───────────────────────────────────────
   useEffect(() => {
@@ -167,7 +169,7 @@ export default function PreviewPage({ params }: Props) {
       </header>
 
       {/* ── 초대장 미리보기 (캡처 대상 포함) ── */}
-      <main className="flex-1 overflow-y-auto pb-[148px]">
+      <main className="flex-1 overflow-y-auto pb-[240px]">
         <div ref={captureRef}>
           <InvitationPreview data={data} isPreview />
         </div>
@@ -192,7 +194,6 @@ export default function PreviewPage({ params }: Props) {
             className={`${btnBase} border border-[#E8D8D0] bg-white text-[#5A3A3A]
                         hover:border-[#C4607A]/30 hover:bg-[#FFF5F7]`}
           >
-            {/* 링크 아이콘 / 체크 아이콘 */}
             {copied ? (
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A7A60" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
@@ -214,7 +215,6 @@ export default function PreviewPage({ params }: Props) {
             onClick={handleShareKakao}
             className={`${btnBase} bg-[#FEE500] text-[#3A1D1D] hover:bg-[#FDD800]`}
           >
-            {/* 카카오 말풍선 아이콘 */}
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#3A1D1D">
               <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.701 1.553 5.084 3.9 6.51L4.8 21l4.63-2.46A11.5 11.5 0 0 0 12 18.6c5.523 0 10-3.477 10-7.8S17.523 3 12 3Z" />
             </svg>
@@ -246,6 +246,47 @@ export default function PreviewPage({ params }: Props) {
           </button>
 
         </div>
+
+        {/* 관리 코드 박스 */}
+        {data.manageCode && (
+          <div className="mt-3 flex items-center justify-between rounded-xl
+                          border border-[#E8D8D0] bg-[#FFF5F7] px-4 py-2.5">
+            <div>
+              <p className="font-dodum text-[10px] tracking-widest text-[#9E7070]">
+                참석 현황 관리 코드 (안전한 곳에 보관하세요)
+              </p>
+              <p className="mt-0.5 font-myeongjo text-[20px] font-extrabold tracking-[6px] text-[#C4607A]">
+                {data.manageCode}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                try { await navigator.clipboard.writeText(data.manageCode!) }
+                catch { /* 무시 */ }
+                setCodeCopied(true)
+                setTimeout(() => setCodeCopied(false), 2000)
+              }}
+              className="ml-3 shrink-0 rounded-lg border border-[#E8D8D0] bg-white
+                         px-3 py-1.5 font-dodum text-[11px] text-[#C4607A]
+                         transition-colors hover:bg-[#FCE0E6]"
+            >
+              {codeCopied ? '복사됨!' : '복사'}
+            </button>
+          </div>
+        )}
+
+        {/* 참석 현황 확인 버튼 */}
+        <Link
+          href={`/manage/${params.id}`}
+          className="mt-2.5 flex w-full items-center justify-center gap-1.5
+                     rounded-xl border border-[#C4607A]/30 py-2.5
+                     font-dodum text-[12px] text-[#C4607A]
+                     transition-colors hover:bg-[#FFF5F7]"
+        >
+          참석 현황 확인
+          <span aria-hidden="true">→</span>
+        </Link>
       </div>
     </div>
   )

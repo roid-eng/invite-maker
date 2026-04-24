@@ -10,23 +10,25 @@ import { nanoid } from 'nanoid'
 import { db } from './index'
 import type { InvitationData } from '@/types'
 
-type CreateInput = Omit<InvitationData, 'id' | 'createdAt' | 'viewCount' | 'meta'>
+type CreateInput = Omit<InvitationData, 'id' | 'createdAt' | 'viewCount' | 'meta' | 'manageCode'>
 
 /**
- * 초대장을 Firestore에 저장하고 생성된 ID를 반환한다.
- * ID는 nanoid(10)으로 생성한다.
+ * 초대장을 Firestore에 저장하고 생성된 ID와 관리 코드를 반환한다.
+ * ID는 nanoid(10), 관리 코드는 nanoid(4).toUpperCase()로 생성한다.
  */
-export async function createInvitation(data: CreateInput): Promise<string> {
-  const id = nanoid(10)
-  const ref = doc(db, 'invitations', id)
+export async function createInvitation(data: CreateInput): Promise<{ id: string; manageCode: string }> {
+  const id         = nanoid(10)
+  const manageCode = nanoid(4).toUpperCase()
+  const ref        = doc(db, 'invitations', id)
 
   try {
     await setDoc(ref, {
       ...data,
+      manageCode,
       viewCount: 0,
       createdAt: serverTimestamp(),
     })
-    return id
+    return { id, manageCode }
   } catch (error) {
     throw new Error(
       `초대장 저장에 실패했습니다. ${error instanceof Error ? error.message : String(error)}`,

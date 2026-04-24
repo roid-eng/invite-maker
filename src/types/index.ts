@@ -37,6 +37,7 @@ export type InvitationData = {
   placeAddress: string   // 카카오 주소 API 반환값
   message?: string       // 추가 메시지, 최대 100자
   deadline?: string      // RSVP 마감일 (YYYY-MM-DD)
+  manageCode?: string    // 4자리 관리 코드 (제작자 전용)
   children?: ChildInfo[]
   features?: InvitationFeatures
   meta?: InvitationMeta
