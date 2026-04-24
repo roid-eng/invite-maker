@@ -31,7 +31,7 @@ export default function FamilySection({ theme, members, showFamily }: Props) {
 
   return (
     <section
-      className="px-5 py-6 text-center transition-[background] duration-500"
+      className="px-5 pt-6 pb-8 text-center transition-[background] duration-500"
       style={{ backgroundColor: p.bg }}
     >
       <p

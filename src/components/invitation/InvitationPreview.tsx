@@ -25,7 +25,7 @@ function InvitationFooter({ theme }: { theme: Theme }) {
   const p = FOOTER_PALETTE[theme]
   return (
     <div
-      className="px-5 py-5 text-center transition-[background] duration-500"
+      className="px-5 pt-7 pb-10 text-center transition-[background] duration-500"
       style={{ backgroundColor: p.bg }}
     >
       <p
